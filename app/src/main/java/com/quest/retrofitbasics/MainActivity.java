@@ -14,6 +14,8 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+
 import okhttp3.ResponseBody;
 
 public class MainActivity extends AppCompatActivity {
@@ -47,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(ResponseBody responseBody) {
                 try {
-                    JSONObject jsonObject = new JSONObject(responseBody.toString());
+                    JSONObject jsonObject = new JSONObject(responseBody.string());
                     boolean status = jsonObject.optBoolean("success",false);
                     if(status){
                         Toast.makeText(MainActivity.this, ""+jsonObject.optString("reply"), Toast.LENGTH_SHORT).show();
@@ -55,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(MainActivity.this, "login is"+status, Toast.LENGTH_SHORT).show();
                     }
                 } catch (JSONException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
