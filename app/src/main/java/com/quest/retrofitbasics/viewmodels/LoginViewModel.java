@@ -6,10 +6,16 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.databinding.ObservableField;
 import androidx.databinding.ObservableInt;
 
 import com.quest.retrofitbasics.constants.RetrofitClient;
+import com.quest.retrofitbasics.models.LoginModel;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.Observable;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
@@ -21,17 +27,17 @@ import retrofit2.Response;
 public class LoginViewModel extends Observable {
 
     private Context context;
-    public ObservableInt progressBar;
     SweetAlertDialog pDialog ;
+    public ObservableField<String> useremail = new ObservableField<>("");
+    public ObservableField<String> userpass = new ObservableField<>("");
 
 
     public LoginViewModel(Context context) {
         this.context = context;
-        progressBar=new ObservableInt(View.GONE);
         pDialog = new SweetAlertDialog(context, SweetAlertDialog.PROGRESS_TYPE);
     }
 
-    public void sendLoginRequest(String username,String password){
+    public void sendLoginRequest(String useremail,String password){
         //showToast("in view model logic runnign");
 
         pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
@@ -40,34 +46,30 @@ public class LoginViewModel extends Observable {
         pDialog.show();
 
 
-        Call<ResponseBody> call = RetrofitClient
+        Call<LoginModel> call = RetrofitClient
                 .getInstance()
                 .getApi()
-                .loginUser(username,password);
+                .loginUser(useremail,password);
 
-        call.enqueue(new Callback<ResponseBody>() {
+        call.enqueue(new Callback<LoginModel>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-
+            public void onResponse(Call<LoginModel> call, Response<LoginModel> response) {
                 pDialog.dismiss();
-
-                //TODO ADD LOGIC TO HANDLE JSON REPLY
-
-                Log.d("mwenda", "onResponse: loginvm"+response.body().toString());
-                showToast(response.body().toString());
+                Log.d("mwenda", "onResponse: "+response.body());
+//                if(response.body().getSuccess()){
+//                    Log.d("mwenda", "onResponse: successfule");
+//                }else{
+//                    Log.d("mwenda", "onResponse: not successful");
+//                }
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+            public void onFailure(Call<LoginModel> call, Throwable t) {
                 pDialog.dismiss();
-                //TODO ADD ERROR HANDLING LOGIC
-
-                Log.d("mwenda", "onFailure: "+t.getMessage());
-                showToast(t.getMessage());
-
+                showToast("An error occurred, please try again");
             }
         });
+
     }
 
     void showToast(String msg){

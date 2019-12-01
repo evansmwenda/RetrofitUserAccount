@@ -1,6 +1,7 @@
 package com.quest.retrofitbasics.constants;
 
-import okhttp3.ResponseBody;
+import com.quest.retrofitbasics.models.LoginModel;
+
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
@@ -11,7 +12,7 @@ public interface Api {
 
     @FormUrlEncoded
     @POST("User/login.php")
-    Call<ResponseBody> loginUser(
+    Call<LoginModel> loginUser(
             @Field("email_address") String email_address,
             @Field("password") String password
     );

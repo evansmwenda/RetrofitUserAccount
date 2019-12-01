@@ -1,5 +1,6 @@
 package com.quest.retrofitbasics;
 
+import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -7,23 +8,28 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.quest.retrofitbasics.constants.Api;
 import com.quest.retrofitbasics.constants.RetrofitClient;
+import com.quest.retrofitbasics.models.LoginModel;
 
-import okhttp3.ResponseBody;
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivityViewModel extends ViewModel {
 
     //this is the data that we will fetch asynchronously
-    private MutableLiveData<ResponseBody> loginResponse;
+    private MutableLiveData<LoginModel> loginResponse;
+    private Context context;
+    SweetAlertDialog pDialog ;
+
+//    public MainActivityViewModel(Context context) {
+//        this.context = context;
+//        pDialog = new SweetAlertDialog(context, SweetAlertDialog.PROGRESS_TYPE);
+//    }
 
     //we will call this method to get the data
-    public LiveData<ResponseBody> getHeroes(String email_address,String password) {
+    public LiveData<LoginModel> getHeroes(String email_address,String password) {
         //if the list is null
         if (loginResponse == null) {
             loginResponse = new MutableLiveData<>();
@@ -38,21 +44,22 @@ public class MainActivityViewModel extends ViewModel {
 
     //This method is using Retrofit to get the JSON data from URL
     private void loadHeroes(String email_address,String password) {
-        Call<ResponseBody> call = RetrofitClient
+
+        Call<LoginModel> call = RetrofitClient
                 .getInstance()
                 .getApi()
                 .loginUser(email_address,password);
 
-
-        call.enqueue(new Callback<ResponseBody>() {
+        call.enqueue(new Callback<LoginModel>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            public void onResponse(Call<LoginModel> call, Response<LoginModel> response) {
                 loginResponse.setValue(response.body());
+                Log.d("mwenda", "onResponse: "+response.body());
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+            public void onFailure(Call<LoginModel> call, Throwable t) {
+                Log.d("mwenda", "onFailure: "+t.getMessage());
             }
         });
 
